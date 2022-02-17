@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: PersistantVolume
+metadata:
+  name: nfs-storage
+spec:
+  capacity:
+    storage: 10Gi
+  acccessModes:
+    - ReadwriteMany
+  nfs:
+    server: nfs_ip
+    path: /mnt/nfs
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fileshare
+spec:
+  acccessModes:
+    - ReadwriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: back-with-nfs
+spec:
+  containers:
+    - image: 7zgymko/back:v1
+        imagePullPolicy: IfNotPresent
+        name: back
+        volumeMounts:
+          - mountPath: /mnt/nfs
+            name: my-volume
+  volumes:
+    - name: my-volume
+      persistentVolumeClaim:
+        className: fileshare
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: back-with-nfs
+spec:
+  containers:
+    - image: 7zgymko/front:v1
+        imagePullPolicy: IfNotPresent
+        name: front
+        volumeMounts:
+          - mountPath: /mnt/nfs
+            name: my-volume
+  volumes:
+    - name: my-volume
+      persistentVolumeClaim:
+        className: fileshare

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-in-volumes
+spec:
+  containers:
+    - image: 7zgymko/front:v1
+      imagePullPolicy: IfNotPresent
+      name: front
+      volumeMounts:
+        - mountPath: "/static"
+          name: my-volume
+    - image: 7zgymko/back:v1
+      imagePullPolicy: IfNotPresent
+      name: back
+      volumeMounts:
+        - mountPath: "/static"
+          name: my-volume
+  volumes:
+    - name: my-volume
+      emptyDir: {}
